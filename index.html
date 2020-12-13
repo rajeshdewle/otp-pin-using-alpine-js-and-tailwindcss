@@ -28,6 +28,7 @@
                         :x-ref="index"
                         x-on:input="handleInput($event)"
                         x-on:paste="handlePaste($event)"
+                        x-on:keydown.backspace="$event.target.value || handleBackspace($event.target.getAttribute('x-ref'))"
                     />
                   </template>
                 </div>
@@ -65,6 +66,11 @@
                         inputs.forEach((element, i) => {
                             this.$refs[i].value = paste[i] || '';
                         });
+                    },
+
+                    handleBackspace(e) {
+                        const previous = parseInt(e, 10) - 1;
+                        this.$refs[previous] && this.$refs[previous].focus();
                     },
               };
             }
