@@ -27,6 +27,7 @@
                         class="border border-gray-500 w-10 h-10 text-center"
                         :x-ref="index"
                         x-on:input="handleInput($event)"
+                        x-on:paste="handlePaste($event)"
                     />
                   </template>
                 </div>
@@ -50,10 +51,21 @@
                         }).join("");
 
                         if (input.nextElementSibling && input.value) {
-                        input.nextElementSibling.focus();
-                        input.nextElementSibling.select();
-                    }
-                },
+                            input.nextElementSibling.focus();
+                            input.nextElementSibling.select();
+                        }
+                    },
+
+                    handlePaste(e) {
+                        const paste = e.clipboardData.getData('text');
+                        this.value = paste;
+
+                        const inputs = Array.from(Array(this.length));
+
+                        inputs.forEach((element, i) => {
+                            this.$refs[i].value = paste[i] || '';
+                        });
+                    },
               };
             }
         </script>
