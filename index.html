@@ -22,9 +22,11 @@
                 <div class="flex justify-between">
                   <template x-for="(input, index) in length" :key="index">
                     <input
-                      type="tel"
-                      maxlength="1"
-                      class="border border-gray-500 w-10 h-10 text-center"
+                        type="tel"
+                        maxlength="1"
+                        class="border border-gray-500 w-10 h-10 text-center"
+                        :x-ref="index"
+                        x-on:input="handleInput($event)"
                     />
                   </template>
                 </div>
@@ -36,9 +38,22 @@
         </div>
         <script>
             function otpForm() {
-              return {
-                length: 6,
-                value: "",
+                return {
+                    length: 6,
+                    value: "",
+
+                    handleInput(e) {
+                        const input = e.target;
+
+                        this.value = Array.from(Array(this.length), (element, i) => {
+                        return this.$refs[i].value || "";
+                        }).join("");
+
+                        if (input.nextElementSibling && input.value) {
+                        input.nextElementSibling.focus();
+                        input.nextElementSibling.select();
+                    }
+                },
               };
             }
         </script>
