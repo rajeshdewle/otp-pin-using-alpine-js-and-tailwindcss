@@ -19,7 +19,15 @@
     <body>
         <div class="py-6 px-6 w-80 border mx-auto text-center my-6">
             <form action="#" x-data="otpForm()" method="POST">
-              <!-- ... -->
+                <div class="flex justify-between">
+                  <template x-for="(input, index) in length" :key="index">
+                    <input
+                      type="tel"
+                      maxlength="1"
+                      class="border border-gray-500 w-10 h-10 text-center"
+                    />
+                  </template>
+                </div>
             </form>
         </div>
         <script>
