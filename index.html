@@ -6,29 +6,25 @@
         <title>OTP/Pin Number Module</title>
 
         <!-- Tailwind CSS -->
-        <link
-            href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css"
-            rel="stylesheet"
-        />
+        <script src="https://cdn.tailwindcss.com"></script>
         <!-- Alpine.js -->
         <script
-            src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.7.3/dist/alpine.min.js"
+            src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
             defer
         ></script>
     </head>
     <body>
         <div class="py-6 px-6 w-80 border mx-auto text-center my-6">
             <form action="#" x-data="otpForm()" method="POST">
-                <div class="flex justify-between">
+                <div class="flex justify-between" x-ref="otpInputContainer">
                   <template x-for="(input, index) in length" :key="index">
                     <input
                         type="tel"
                         maxlength="1"
-                        class="border border-gray-500 w-10 h-10 text-center"
-                        :x-ref="index"
-                        x-on:input="handleInput($event)"
+                        class="otpInput border border-gray-500 w-10 h-10 text-center"
+                        x-on:input="handleInput($event, index)"
                         x-on:paste="handlePaste($event)"
-                        x-on:keydown.backspace="$event.target.value || handleBackspace($event.target.getAttribute('x-ref'))"
+                        x-on:keydown.backspace="$event.target.value || handleBackspace($event, index)"
                     />
                   </template>
                 </div>
@@ -44,35 +40,39 @@
                     length: 6,
                     value: "",
 
-                    handleInput(e) {
-                        const input = e.target;
+                    get inputs() {
+                        return this.$refs.otpInputContainer.querySelectorAll('.otpInput');
+                    },
 
-                        this.value = Array.from(Array(this.length), (element, i) => {
-                        return this.$refs[i].value || "";
-                        }).join("");
-
-                        if (input.nextElementSibling && input.value) {
-                            input.nextElementSibling.focus();
-                            input.nextElementSibling.select();
+                    handleInput(e, index) {
+                        const inputValues = [...this.inputs].map(input => input.value);
+                        this.value = inputValues.join('');
+                        if (e.target.value) {
+                            const nextInput = this.inputs[index + 1];
+                            if (nextInput) {
+                                nextInput.focus();
+                                nextInput.select();
+                            }
                         }
                     },
 
                     handlePaste(e) {
-                        const paste = e.clipboardData.getData('text');
-                        this.value = paste;
-
-                        const inputs = Array.from(Array(this.length));
-
-                        inputs.forEach((element, i) => {
-                            this.$refs[i].value = paste[i] || '';
+                        const paste = e.clipboardData.getData('text').slice(0, this.length);
+                        paste.split('').forEach((char, i) => {
+                            if (this.inputs[i]) {
+                                this.inputs[i].value = char;
+                            }
                         });
+                        this.value = [...this.inputs].map(input => input.value).join('');
                     },
 
-                    handleBackspace(e) {
-                        const previous = parseInt(e, 10) - 1;
-                        this.$refs[previous] && this.$refs[previous].focus();
+                    handleBackspace(e, index) {
+                        if (index > 0) {
+                            this.inputs[index - 1].focus();
+                            this.inputs[index - 1].select();
+                        }
                     },
-              };
+                };
             }
         </script>
     </body>
